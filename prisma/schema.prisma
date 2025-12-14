@@ -1,0 +1,62 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// =====================
+// API Keys Table
+// =====================
+model ApiKey {
+  id        String   @id @default(uuid())
+  name      String
+  apiKey    String   @unique @map("api_key")
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("api_keys")
+}
+
+// =====================
+// Students Table
+// =====================
+model Student {
+  id              String   @id @default(uuid())
+  noReg           String   @unique @map("no_reg")
+  namaLengkap     String   @map("nama_lengkap")
+  jalur           String
+  jurusan         String
+  email           String
+  phone           String
+  tahunLulus      Int      @map("tahun_lulus")
+  gender          String
+  asalSekolah     String   @map("asal_sekolah")
+  jurusanSekolah  String   @map("jurusan_sekolah")
+  ranking         Int
+  namaOrangTua    String   @map("nama_orang_tua")
+  hpOrangTua      String   @map("hp_orang_tua")
+  agama           String
+  butaWarna       Boolean  @default(false) @map("buta_warna")
+  provinsi        String
+  kotaKabupaten   String   @map("kota_kabupaten")
+  kelurahan       String
+  kecamatan       String
+  kodePos         String   @map("kode_pos")
+  alamatRumah     String   @map("alamat_rumah")
+  pilihanJurusan2 String?  @map("pilihan_jurusan_2")
+  pilihanJurusan3 String?  @map("pilihan_jurusan_3")
+  pilihanJurusan4 String?  @map("pilihan_jurusan_4")
+  agent           String?
+  loaPublished    Boolean  @default(false) @map("loa_published")
+  tanggalLoa      DateTime? @map("tanggal_loa")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("students")
+}
