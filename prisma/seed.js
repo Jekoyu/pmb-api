@@ -87,6 +87,43 @@ async function main() {
     console.log(`✅ Created student: ${student.namaLengkap}`);
   }
 
+  // Create sample study programs
+  const studyPrograms = [
+    {
+      id: uuidv4(),
+      code: '51',
+      name: 'Teknik Informatika',
+      nimFormat: '{year}{code}{sequence}',
+      isActive: true,
+    },
+    {
+      id: uuidv4(),
+      code: '52',
+      name: 'Sistem Informasi',
+      nimFormat: '{year}{code}{sequence}',
+      isActive: true,
+    },
+    {
+      id: uuidv4(),
+      code: '53',
+      name: 'Manajemen Informatika',
+      nimFormat: '{year}{code}{sequence}',
+      isActive: true,
+    },
+    {
+      id: uuidv4(),
+      code: '54',
+      name: 'Akuntansi',
+      nimFormat: '{year}{code}{sequence}',
+      isActive: true,
+    },
+  ];
+
+  for (const prodi of studyPrograms) {
+    await prisma.studyProgram.create({ data: prodi });
+    console.log(`✅ Created study program: ${prodi.name}`);
+  }
+
   console.log('🎉 Database seed completed!');
 }
 

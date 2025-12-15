@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import apiKeyRoutes from './apiKeyRoutes.js';
 import studentRoutes from './studentRoutes.js';
+import studyProgramRoutes from './studyProgramRoutes.js';
 
 const router = Router();
 
@@ -16,5 +17,6 @@ router.get('/health', (req, res) => {
 // Mount routes
 router.use('/api-keys', apiKeyRoutes);
 router.use('/students', studentRoutes);
+router.use('/study-programs', studyProgramRoutes);
 
 export default router;
