@@ -12,7 +12,7 @@
     "db:generate": "npx prisma generate",
     "db:migrate:deploy": "npx prisma migrate deploy",
     "db:push": "npx prisma db push",
-    "db:push:prod": "npx prisma db push --accept-data-loss",
+    "db:push:prod": "npx prisma db push --force-reset",
     "db:seed": "bun prisma/seed.js",
     "db:studio": "npx prisma studio"
   },
