@@ -25,12 +25,6 @@ class StudyProgramService {
   /**
    * Get all study programs with optional filtering
    * @param {Object} options - Query options
-   * @param {number} options.page - Page number (default: 1)
-   * @param {number} options.limit - Items per page (default: 10)
-   * @param {string} options.search - Search term for name or code
-   * @param {boolean} options.isActive - Filter by active status
-   * @param {string} options.sortBy - Field to sort by (default: createdAt)
-   * @param {string} options.sortOrder - Sort order: asc or desc (default: desc)
    * @returns {Promise<Object>} Paginated study program list
    */
   async findAll(options = {}) {
@@ -39,6 +33,8 @@ class StudyProgramService {
       limit = 10,
       search = '',
       isActive,
+      idJenjang,
+      idFakultas,
       sortBy = 'createdAt',
       sortOrder = 'desc',
     } = options;
@@ -50,13 +46,22 @@ class StudyProgramService {
 
     if (search) {
       where.OR = [
-        { name: { contains: search, mode: 'insensitive' } },
-        { code: { contains: search, mode: 'insensitive' } },
+        { namaProdi: { contains: search, mode: 'insensitive' } },
+        { idProdi: { contains: search, mode: 'insensitive' } },
+        { namaFakultas: { contains: search, mode: 'insensitive' } },
       ];
     }
 
     if (typeof isActive === 'boolean') {
       where.isActive = isActive;
+    }
+
+    if (idJenjang) {
+      where.idJenjang = idJenjang;
+    }
+
+    if (idFakultas) {
+      where.idFakultas = idFakultas;
     }
 
     // Get total count
@@ -97,13 +102,13 @@ class StudyProgramService {
   }
 
   /**
-   * Get study program by code
-   * @param {string} code - Study program code
+   * Get study program by idProdi
+   * @param {string} idProdi - Study program prodi ID
    * @returns {Promise<Object|null>} Study program record or null
    */
-  async findByCode(code) {
+  async findByIdProdi(idProdi) {
     const studyProgram = await prisma.studyProgram.findUnique({
-      where: { code },
+      where: { idProdi },
     });
 
     return studyProgram;
@@ -138,15 +143,15 @@ class StudyProgramService {
   }
 
   /**
-   * Check if code exists
-   * @param {string} code - Study program code
+   * Check if idProdi exists
+   * @param {string} idProdi - Study program prodi ID
    * @param {string} excludeId - ID to exclude (for updates)
    * @returns {Promise<boolean>} True if exists
    */
-  async codeExists(code, excludeId = null) {
+  async idProdiExists(idProdi, excludeId = null) {
     const where = excludeId
-      ? { code, NOT: { id: excludeId } }
-      : { code };
+      ? { idProdi, NOT: { id: excludeId } }
+      : { idProdi };
 
     const count = await prisma.studyProgram.count({ where });
     return count > 0;
@@ -159,16 +164,65 @@ class StudyProgramService {
   async findAllActive() {
     const studyPrograms = await prisma.studyProgram.findMany({
       where: { isActive: true },
-      orderBy: { name: 'asc' },
+      orderBy: { namaProdi: 'asc' },
       select: {
         id: true,
-        code: true,
-        name: true,
-        nimFormat: true,
+        idProdi: true,
+        namaProdi: true,
+        idJenjang: true,
+        namaJenjang: true,
+        idFakultas: true,
+        namaFakultas: true,
       },
     });
 
     return studyPrograms;
+  }
+
+  /**
+   * Bulk create/update study programs (for sync from external API)
+   * @param {Array} programs - Array of study programs
+   * @returns {Promise<Object>} Result summary
+   */
+  async syncFromExternal(programs) {
+    let created = 0;
+    let updated = 0;
+    let errors = [];
+
+    for (const program of programs) {
+      try {
+        const existing = await prisma.studyProgram.findUnique({
+          where: { idProdi: program.idProdi || program.id_prodi }
+        });
+
+        const data = {
+          idProdi: program.idProdi || program.id_prodi,
+          namaProdi: program.namaProdi || program.nama_prodi,
+          idJenjang: program.idJenjang || program.id_jenjang,
+          namaJenjang: program.namaJenjang || program.nama_jenjang,
+          idFakultas: program.idFakultas || program.id_fakultas,
+          namaFakultas: program.namaFakultas || program.nama_fakultas,
+          isActive: true,
+        };
+
+        if (existing) {
+          await prisma.studyProgram.update({
+            where: { idProdi: data.idProdi },
+            data,
+          });
+          updated++;
+        } else {
+          await prisma.studyProgram.create({
+            data: { id: uuidv4(), ...data },
+          });
+          created++;
+        }
+      } catch (error) {
+        errors.push({ idProdi: program.idProdi || program.id_prodi, error: error.message });
+      }
+    }
+
+    return { created, updated, errors };
   }
 }
 

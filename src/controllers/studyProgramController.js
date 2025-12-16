@@ -14,7 +14,7 @@ class StudyProgramController {
       const data = req.body;
 
       // Validate required fields
-      const requiredFields = ['code', 'name', 'nimFormat'];
+      const requiredFields = ['idProdi', 'namaProdi', 'idJenjang', 'namaJenjang', 'idFakultas', 'namaFakultas'];
       const missingFields = requiredFields.filter(field => !data[field]);
       
       if (missingFields.length > 0) {
@@ -25,22 +25,13 @@ class StudyProgramController {
         });
       }
 
-      // Validate code length (max 4 characters)
-      if (data.code.length > 4) {
-        return res.status(400).json({
-          success: false,
-          error: 'Bad Request',
-          message: 'Code must be maximum 4 characters.',
-        });
-      }
-
-      // Check if code already exists
-      const codeExists = await studyProgramService.codeExists(data.code);
-      if (codeExists) {
+      // Check if idProdi already exists
+      const exists = await studyProgramService.idProdiExists(data.idProdi);
+      if (exists) {
         return res.status(409).json({
           success: false,
           error: 'Conflict',
-          message: `Study program with code ${data.code} already exists.`,
+          message: `Study program with idProdi ${data.idProdi} already exists.`,
         });
       }
 
@@ -72,6 +63,8 @@ class StudyProgramController {
         limit = 10,
         search = '',
         isActive,
+        idJenjang,
+        idFakultas,
         sortBy = 'createdAt',
         sortOrder = 'desc',
       } = req.query;
@@ -86,6 +79,8 @@ class StudyProgramController {
         limit: parseInt(limit, 10),
         search,
         isActive: activeFilter,
+        idJenjang,
+        idFakultas,
         sortBy,
         sortOrder,
       });
@@ -164,23 +159,14 @@ class StudyProgramController {
         });
       }
 
-      // Validate code length if provided
-      if (data.code && data.code.length > 4) {
-        return res.status(400).json({
-          success: false,
-          error: 'Bad Request',
-          message: 'Code must be maximum 4 characters.',
-        });
-      }
-
-      // Check if new code conflicts with another study program
-      if (data.code && data.code !== existingProgram.code) {
-        const codeExists = await studyProgramService.codeExists(data.code, id);
-        if (codeExists) {
+      // Check if new idProdi conflicts with another study program
+      if (data.idProdi && data.idProdi !== existingProgram.idProdi) {
+        const exists = await studyProgramService.idProdiExists(data.idProdi, id);
+        if (exists) {
           return res.status(409).json({
             success: false,
             error: 'Conflict',
-            message: `Study program with code ${data.code} already exists.`,
+            message: `Study program with idProdi ${data.idProdi} already exists.`,
           });
         }
       }
@@ -220,6 +206,34 @@ class StudyProgramController {
       res.status(200).json({
         success: true,
         message: 'Study program deleted successfully.',
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * POST /study-programs/sync
+   * Sync study programs from external API data
+   */
+  async sync(req, res, next) {
+    try {
+      const { data } = req.body;
+
+      if (!data || !Array.isArray(data)) {
+        return res.status(400).json({
+          success: false,
+          error: 'Bad Request',
+          message: 'Request body must contain a "data" array of study programs.',
+        });
+      }
+
+      const result = await studyProgramService.syncFromExternal(data);
+
+      res.status(200).json({
+        success: true,
+        message: `Sync completed. Created: ${result.created}, Updated: ${result.updated}`,
+        data: result,
       });
     } catch (error) {
       next(error);

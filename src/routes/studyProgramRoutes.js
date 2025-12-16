@@ -43,6 +43,13 @@ router.get('/:id', (req, res, next) => studyProgramController.findById(req, res,
 router.put('/:id', (req, res, next) => studyProgramController.update(req, res, next));
 
 /**
+ * @route   POST /study-programs/sync
+ * @desc    Sync study programs from external API data
+ * @access  Protected (API Key required)
+ */
+router.post('/sync', (req, res, next) => studyProgramController.sync(req, res, next));
+
+/**
  * @route   DELETE /study-programs/:id
  * @desc    Delete a study program
  * @access  Protected (API Key required)

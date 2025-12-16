@@ -65,13 +65,16 @@ model Student {
 // Study Programs Table
 // =====================
 model StudyProgram {
-  id        String   @id @default(uuid())
-  code      String   @unique
-  name      String
-  nimFormat String   @map("nim_format")
-  isActive  Boolean  @default(true) @map("is_active")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id           String   @id @default(uuid())
+  idProdi      String   @unique @map("id_prodi")
+  namaProdi    String   @map("nama_prodi")
+  idJenjang    String   @map("id_jenjang")
+  namaJenjang  String   @map("nama_jenjang")
+  idFakultas   String   @map("id_fakultas")
+  namaFakultas String   @map("nama_fakultas")
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
   @@map("study_programs")
 }

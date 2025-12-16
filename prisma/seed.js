@@ -105,43 +105,55 @@ async function main() {
   // Create sample study programs (upsert to avoid duplicates)
   const studyPrograms = [
     {
-      code: '51',
-      name: 'Teknik Informatika',
-      nimFormat: '{year}{code}{sequence}',
+      idProdi: '10',
+      namaProdi: 'Akuntansi',
+      idJenjang: '5',
+      namaJenjang: 'S1',
+      idFakultas: '1',
+      namaFakultas: 'Fakultas Digital, Desain dan Bisnis',
       isActive: true,
     },
     {
-      code: '52',
-      name: 'Sistem Informasi',
-      nimFormat: '{year}{code}{sequence}',
+      idProdi: '11',
+      namaProdi: 'Manajemen',
+      idJenjang: '5',
+      namaJenjang: 'S1',
+      idFakultas: '1',
+      namaFakultas: 'Fakultas Digital, Desain dan Bisnis',
       isActive: true,
     },
     {
-      code: '53',
-      name: 'Manajemen Informatika',
-      nimFormat: '{year}{code}{sequence}',
+      idProdi: '12',
+      namaProdi: 'Arsitektur',
+      idJenjang: '5',
+      namaJenjang: 'S1',
+      idFakultas: '2',
+      namaFakultas: 'Fakultas Teknik dan Informatika',
       isActive: true,
     },
     {
-      code: '54',
-      name: 'Akuntansi',
-      nimFormat: '{year}{code}{sequence}',
+      idProdi: '13',
+      namaProdi: 'Teknik Informatika',
+      idJenjang: '5',
+      namaJenjang: 'S1',
+      idFakultas: '2',
+      namaFakultas: 'Fakultas Teknik dan Informatika',
       isActive: true,
     },
   ];
 
   for (const prodi of studyPrograms) {
     const existing = await prisma.studyProgram.findUnique({
-      where: { code: prodi.code }
+      where: { idProdi: prodi.idProdi }
     });
 
     if (!existing) {
       await prisma.studyProgram.create({ 
         data: { id: uuidv4(), ...prodi } 
       });
-      console.log(`✅ Created study program: ${prodi.name}`);
+      console.log(`✅ Created study program: ${prodi.namaProdi}`);
     } else {
-      console.log(`⏭️  Study program ${prodi.name} already exists, skipping...`);
+      console.log(`⏭️  Study program ${prodi.namaProdi} already exists, skipping...`);
     }
   }
 
