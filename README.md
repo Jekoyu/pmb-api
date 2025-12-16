@@ -49,7 +49,7 @@ bun install
 
 ```bash
 # Generate Prisma Client
-bun run db:generate
+bun run d
 
 # Run migrations
 bun run db:migrate
@@ -100,30 +100,30 @@ curl -X POST http://localhost:3000/api/v1/api-keys \
 
 ### Health Check
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/v1/health` | Status API |
+| Method | Endpoint         | Description |
+| ------ | ---------------- | ----------- |
+| GET    | `/api/v1/health` | Status API  |
 
 ### API Keys (Public)
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/v1/api-keys` | Generate API key baru |
-| GET | `/api/v1/api-keys` | List semua API keys |
-| GET | `/api/v1/api-keys/:id` | Detail API key |
-| PUT | `/api/v1/api-keys/:id/disable` | Nonaktifkan API key |
-| PUT | `/api/v1/api-keys/:id/enable` | Aktifkan API key |
-| DELETE | `/api/v1/api-keys/:id` | Hapus API key |
+| Method | Endpoint                       | Description           |
+| ------ | ------------------------------ | --------------------- |
+| POST   | `/api/v1/api-keys`             | Generate API key baru |
+| GET    | `/api/v1/api-keys`             | List semua API keys   |
+| GET    | `/api/v1/api-keys/:id`         | Detail API key        |
+| PUT    | `/api/v1/api-keys/:id/disable` | Nonaktifkan API key   |
+| PUT    | `/api/v1/api-keys/:id/enable`  | Aktifkan API key      |
+| DELETE | `/api/v1/api-keys/:id`         | Hapus API key         |
 
 ### Students (Protected - Wajib API Key)
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/v1/students` | Tambah mahasiswa |
-| GET | `/api/v1/students` | List mahasiswa (pagination) |
-| GET | `/api/v1/students/:id` | Detail mahasiswa |
-| PUT | `/api/v1/students/:id` | Update mahasiswa |
-| DELETE | `/api/v1/students/:id` | Hapus mahasiswa |
+| Method | Endpoint               | Description                 |
+| ------ | ---------------------- | --------------------------- |
+| POST   | `/api/v1/students`     | Tambah mahasiswa            |
+| GET    | `/api/v1/students`     | List mahasiswa (pagination) |
+| GET    | `/api/v1/students/:id` | Detail mahasiswa            |
+| PUT    | `/api/v1/students/:id` | Update mahasiswa            |
+| DELETE | `/api/v1/students/:id` | Hapus mahasiswa             |
 
 ## 🔐 Mengakses Protected Endpoints
 
@@ -139,6 +139,7 @@ curl -X GET http://localhost:3000/api/v1/students \
 ### 1. Generate API Key
 
 **Request:**
+
 ```bash
 POST /api/v1/api-keys
 Content-Type: application/json
@@ -149,6 +150,7 @@ Content-Type: application/json
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -166,6 +168,7 @@ Content-Type: application/json
 ### 2. Create Student
 
 **Request:**
+
 ```bash
 POST /api/v1/students
 Content-Type: application/json
@@ -203,6 +206,7 @@ x-api-key: pmb_a1b2c3d4e5f6g7h8i9j0
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -210,7 +214,7 @@ x-api-key: pmb_a1b2c3d4e5f6g7h8i9j0
   "data": {
     "id": "uuid-here",
     "noReg": "REG-2025-003",
-    "namaLengkap": "Budi Santoso",
+    "namaLengkap": "Budi Santoso"
     // ... semua field lainnya
   }
 }
@@ -219,12 +223,14 @@ x-api-key: pmb_a1b2c3d4e5f6g7h8i9j0
 ### 3. List Students dengan Pagination & Search
 
 **Request:**
+
 ```bash
 GET /api/v1/students?page=1&limit=10&search=Budi
 x-api-key: pmb_a1b2c3d4e5f6g7h8i9j0
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -244,11 +250,13 @@ x-api-key: pmb_a1b2c3d4e5f6g7h8i9j0
 ### 4. Error Response (401 Unauthorized)
 
 **Request tanpa API Key:**
+
 ```bash
 GET /api/v1/students
 ```
 
 **Response:**
+
 ```json
 {
   "success": false,
@@ -259,13 +267,13 @@ GET /api/v1/students
 
 ## 📊 Query Parameters untuk List Students
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| page | number | 1 | Halaman yang ingin ditampilkan |
-| limit | number | 10 | Jumlah data per halaman |
-| search | string | - | Cari berdasarkan nama, no_reg, atau email |
-| sortBy | string | createdAt | Field untuk sorting |
-| sortOrder | string | desc | Urutan: asc atau desc |
+| Parameter | Type   | Default   | Description                               |
+| --------- | ------ | --------- | ----------------------------------------- |
+| page      | number | 1         | Halaman yang ingin ditampilkan            |
+| limit     | number | 10        | Jumlah data per halaman                   |
+| search    | string | -         | Cari berdasarkan nama, no_reg, atau email |
+| sortBy    | string | createdAt | Field untuk sorting                       |
+| sortOrder | string | desc      | Urutan: asc atau desc                     |
 
 ## 🧪 Testing dengan cURL
 
@@ -308,6 +316,158 @@ curl -X POST http://localhost:3000/api/v1/students \
     "kodePos": "12160",
     "alamatRumah": "Jl. Test No. 1"
   }'
+```
+
+## 🚀 Deployment Guide
+
+### Server Requirements
+
+- **Runtime**: Bun v1.0+ atau Node.js v18+
+- **Database**: SQLite (untuk dev) / PostgreSQL/MySQL (untuk production)
+- **Memory**: Minimum 512MB RAM
+- **Disk**: Minimum 1GB untuk database
+
+### Setup Commands (Server)
+
+#### 1. Clone & Install
+
+```bash
+# Clone repository
+git clone https://github.com/your-repo/pmb-service.git
+cd pmb-service
+
+# Install dependencies
+bun install
+```
+
+#### 2. Environment Setup
+
+```bash
+# Copy environment file
+cp .env.example .env
+
+# Edit environment variables
+nano .env
+```
+
+Contoh isi `.env`:
+
+```env
+PORT=3001
+NODE_ENV=production
+DB_PROVIDER=sqlite
+DATABASE_URL="file:./pmb.db"
+```
+
+#### 3. Database Setup
+
+```bash
+# Generate Prisma Client
+bun run db:generate
+
+# Run migrations (production)
+bunx prisma migrate deploy
+
+# (Optional) Seed initial data
+bun run db:seed
+```
+
+#### 4. Running the Server
+
+**Development Mode:**
+
+```bash
+bun run dev
+```
+
+**Production Mode (Direct):**
+
+```bash
+bun run start
+```
+
+**Production Mode (PM2):**
+
+```bash
+# Install PM2 globally
+npm install -g pm2
+
+# Start with PM2
+pm2 start bun --name "pmb-service" -- run start
+
+# View logs
+pm2 logs pmb-service
+
+# Restart service
+pm2 restart pmb-service
+
+# Stop service
+pm2 stop pmb-service
+
+# Enable auto-start on boot
+pm2 startup
+pm2 save
+```
+
+**Production Mode (Docker):**
+
+```bash
+# Build image
+docker build -t pmb-service .
+
+# Run container
+docker run -d \
+  --name pmb-service \
+  -p 3001:3001 \
+  -v $(pwd)/prisma/pmb.db:/app/prisma/pmb.db \
+  -e NODE_ENV=production \
+  pmb-service
+
+# View logs
+docker logs -f pmb-service
+```
+
+### Quick Reference Commands
+
+| Action               | Command                                           |
+| -------------------- | ------------------------------------------------- |
+| Install dependencies | `bun install`                                     |
+| Generate Prisma      | `bun run db:generate`                             |
+| Run migrations       | `bunx prisma migrate deploy`                      |
+| Seed database        | `bun run db:seed`                                 |
+| Start dev            | `bun run dev`                                     |
+| Start production     | `bun run start`                                   |
+| View database        | `bun run db:studio`                               |
+| PM2 start            | `pm2 start bun --name "pmb-service" -- run start` |
+| PM2 logs             | `pm2 logs pmb-service`                            |
+| PM2 restart          | `pm2 restart pmb-service`                         |
+
+### Troubleshooting
+
+**Database connection error:**
+
+```bash
+# Reset database
+rm prisma/pmb.db
+bun run db:generate
+bunx prisma migrate deploy
+```
+
+**Permission denied:**
+
+```bash
+# Fix file permissions
+chmod -R 755 ./
+```
+
+**Port already in use:**
+
+```bash
+# Find process using port
+lsof -i :3001
+
+# Kill process
+kill -9 <PID>
 ```
 
 ## 📄 License
