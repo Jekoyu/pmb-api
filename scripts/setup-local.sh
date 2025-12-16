@@ -1,12 +1,45 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+#!/bin/bash
+
+# ============================================
+# PMB Service - Local SQLite Setup Script
+# ============================================
+# This script sets up SQLite for local development
+# Run this after cloning the repository
+
+set -e
+
+echo "🚀 PMB Service - Local Development Setup"
+echo "========================================="
+
+# Check if .env exists
+if [ ! -f .env ]; then
+  echo "📝 Creating .env file for local development..."
+  cat > .env << EOF
+# Local Development Environment
+PORT=3001
+NODE_ENV=development
+
+# SQLite for local development
+DATABASE_URL="file:./dev.db"
+EOF
+  echo "✅ .env file created"
+else
+  echo "⚠️  .env file already exists, skipping..."
+fi
+
+# Check if local schema exists
+if [ ! -f prisma/schema.local.prisma ]; then
+  echo "📝 Creating local SQLite schema..."
+  cat > prisma/schema.local.prisma << 'EOF'
+// Local Development Schema (SQLite)
+// Use this for local development
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -75,3 +108,30 @@ model StudyProgram {
 
   @@map("study_programs")
 }
+EOF
+  echo "✅ Local schema created"
+else
+  echo "⚠️  Local schema already exists, skipping..."
+fi
+
+# Generate Prisma client with local schema
+echo "🔧 Generating Prisma client for SQLite..."
+npx prisma generate --schema=prisma/schema.local.prisma
+
+# Push schema to database (creates tables)
+echo "📦 Creating SQLite database..."
+npx prisma db push --schema=prisma/schema.local.prisma
+
+# Seed database
+echo "🌱 Seeding database..."
+DATABASE_URL="file:./dev.db" bun prisma/seed.js
+
+echo ""
+echo "========================================="
+echo "✅ Local development setup complete!"
+echo ""
+echo "To start the server:"
+echo "  bun run dev"
+echo ""
+echo "Database file: prisma/dev.db"
+echo "========================================="
