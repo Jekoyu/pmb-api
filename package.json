@@ -11,8 +11,9 @@
     "db:migrate": "npx prisma migrate dev",
     "db:generate": "npx prisma generate",
     "db:migrate:deploy": "npx prisma migrate deploy",
-    "db:seed": "bun prisma/seed.js",
     "db:push": "npx prisma db push",
+    "db:push:prod": "npx prisma db push --accept-data-loss",
+    "db:seed": "bun prisma/seed.js",
     "db:studio": "npx prisma studio"
   },
   "dependencies": {
