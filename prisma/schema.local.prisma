@@ -24,41 +24,62 @@ model ApiKey {
 }
 
 // =====================
-// Students Table
+// Applicants Table
 // =====================
-model Student {
-  id              String   @id @default(uuid())
-  noReg           String   @unique @map("no_reg")
-  namaLengkap     String   @map("nama_lengkap")
-  jalur           String
-  jurusan         String
-  email           String
-  phone           String
-  tahunLulus      Int      @map("tahun_lulus")
-  gender          String
-  asalSekolah     String   @map("asal_sekolah")
-  jurusanSekolah  String   @map("jurusan_sekolah")
-  ranking         Int
-  namaOrangTua    String   @map("nama_orang_tua")
-  hpOrangTua      String   @map("hp_orang_tua")
-  agama           String
-  butaWarna       Boolean  @default(false) @map("buta_warna")
-  provinsi        String
-  kotaKabupaten   String   @map("kota_kabupaten")
-  kelurahan       String
-  kecamatan       String
-  kodePos         String   @map("kode_pos")
-  alamatRumah     String   @map("alamat_rumah")
-  pilihanJurusan2 String?  @map("pilihan_jurusan_2")
-  pilihanJurusan3 String?  @map("pilihan_jurusan_3")
-  pilihanJurusan4 String?  @map("pilihan_jurusan_4")
-  agent           String?
-  loaPublished    Boolean  @default(false) @map("loa_published")
-  tanggalLoa      DateTime? @map("tanggal_loa")
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @updatedAt @map("updated_at")
+model Applicant {
+  id                 String    @id @default(uuid())
+  
+  // Identitas utama
+  registrationNumber String    @unique @map("registration_number") // No Reg
+  fullName           String    @map("full_name") // Nama Lengkap
+  admissionPath      String?   @map("admission_path") // Jalur
+  majorChoice1       String    @map("major_choice_1") // Jurusan
+  
+  // Kontak
+  email              String?
+  phone              String?
+  
+  // Akademik
+  graduationYear     Int?      @map("graduation_year") // Tahun Lulus
+  gender             String?   // L or P
+  schoolOrigin       String?   @map("school_origin") // Asal Sekolah
+  schoolMajor        String?   @map("school_major") // Jurusan Sekolah
+  ranking            Int?
+  
+  // Orang tua
+  parentName         String?   @map("parent_name") // Nama Orang Tua
+  parentPhone        String?   @map("parent_phone") // HP Orang Tua
+  
+  // Data pribadi
+  religion           String?   // Agama
+  colorBlind         Boolean   @default(false) @map("color_blind") // Buta Warna
+  
+  // Alamat
+  province           String?   // Provinsi
+  city               String?   // Kota/Kabupaten
+  village            String?   // Kelurahan
+  district           String?   // Kecamatan
+  postalCode         String?   @map("postal_code") // Kode Pos
+  homeAddress        String?   @map("home_address") // Alamat Rumah
+  
+  // Pilihan jurusan lanjutan
+  majorChoice2       String?   @map("major_choice_2") // Pilihan Jurusan 2
+  majorChoice3       String?   @map("major_choice_3") // Pilihan Jurusan 3
+  majorChoice4       String?   @map("major_choice_4") // Pilihan Jurusan 4
+  
+  // Lainnya
+  agent              String?
+  loaPublished       Boolean   @default(false) @map("loa_published") // LOA Published
+  loaDate            DateTime? @map("loa_date") // Tanggal LOA
+  
+  // Status Mahasiswa
+  nim                String    @unique // NIM wajib diisi
+  convertedAt        DateTime? @map("converted_at") // Waktu konversi ke mahasiswa
+  
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
 
-  @@map("students")
+  @@map("applicants")
 }
 
 // =====================

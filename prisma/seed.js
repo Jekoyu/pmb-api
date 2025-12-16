@@ -25,80 +25,84 @@ async function main() {
     console.log('⏭️  API Key already exists, skipping...');
   }
 
-  // Create sample students (upsert to avoid duplicates)
-  const students = [
+  // Create sample applicants (upsert to avoid duplicates)
+  const applicants = [
     {
-      noReg: 'REG-2025-001',
-      namaLengkap: 'Ahmad Fauzi',
-      jalur: 'Reguler',
-      jurusan: 'Teknik Informatika',
+      registrationNumber: 'REG-2025-001',
+      fullName: 'Ahmad Fauzi',
+      admissionPath: 'Reguler',
+      majorChoice1: 'Teknik Informatika',
       email: 'ahmad.fauzi@example.com',
       phone: '081234567890',
-      tahunLulus: 2025,
-      gender: 'Laki-laki',
-      asalSekolah: 'SMAN 1 Jakarta',
-      jurusanSekolah: 'IPA',
+      graduationYear: 2025,
+      gender: 'L',
+      schoolOrigin: 'SMAN 1 Jakarta',
+      schoolMajor: 'IPA',
       ranking: 5,
-      namaOrangTua: 'Budi Santoso',
-      hpOrangTua: '081234567891',
-      agama: 'Islam',
-      butaWarna: false,
-      provinsi: 'DKI Jakarta',
-      kotaKabupaten: 'Jakarta Selatan',
-      kelurahan: 'Kebayoran Baru',
-      kecamatan: 'Kebayoran Baru',
-      kodePos: '12160',
-      alamatRumah: 'Jl. Senopati No. 123',
-      pilihanJurusan2: 'Sistem Informasi',
-      pilihanJurusan3: null,
-      pilihanJurusan4: null,
+      parentName: 'Budi Santoso',
+      parentPhone: '081234567891',
+      religion: 'Islam',
+      colorBlind: false,
+      province: 'DKI Jakarta',
+      city: 'Jakarta Selatan',
+      village: 'Kebayoran Baru',
+      district: 'Kebayoran Baru',
+      postalCode: '12160',
+      homeAddress: 'Jl. Senopati No. 123',
+      majorChoice2: 'Sistem Informasi',
+      majorChoice3: null,
+      majorChoice4: null,
       agent: null,
       loaPublished: false,
-      tanggalLoa: null,
+      loaDate: null,
+      nim: null,
+      convertedAt: null,
     },
     {
-      noReg: 'REG-2025-002',
-      namaLengkap: 'Siti Rahma',
-      jalur: 'Beasiswa',
-      jurusan: 'Sistem Informasi',
+      registrationNumber: 'REG-2025-002',
+      fullName: 'Siti Rahma',
+      admissionPath: 'Beasiswa',
+      majorChoice1: 'Sistem Informasi',
       email: 'siti.rahma@example.com',
       phone: '081234567892',
-      tahunLulus: 2025,
-      gender: 'Perempuan',
-      asalSekolah: 'SMAN 3 Bandung',
-      jurusanSekolah: 'IPA',
+      graduationYear: 2025,
+      gender: 'P',
+      schoolOrigin: 'SMAN 3 Bandung',
+      schoolMajor: 'IPA',
       ranking: 1,
-      namaOrangTua: 'Iwan Setiawan',
-      hpOrangTua: '081234567893',
-      agama: 'Islam',
-      butaWarna: false,
-      provinsi: 'Jawa Barat',
-      kotaKabupaten: 'Bandung',
-      kelurahan: 'Dago',
-      kecamatan: 'Coblong',
-      kodePos: '40135',
-      alamatRumah: 'Jl. Dago No. 45',
-      pilihanJurusan2: 'Teknik Informatika',
-      pilihanJurusan3: 'Manajemen Informatika',
-      pilihanJurusan4: null,
+      parentName: 'Iwan Setiawan',
+      parentPhone: '081234567893',
+      religion: 'Islam',
+      colorBlind: false,
+      province: 'Jawa Barat',
+      city: 'Bandung',
+      village: 'Dago',
+      district: 'Coblong',
+      postalCode: '40135',
+      homeAddress: 'Jl. Dago No. 45',
+      majorChoice2: 'Teknik Informatika',
+      majorChoice3: 'Manajemen Informatika',
+      majorChoice4: null,
       agent: 'Agent Jakarta',
       loaPublished: true,
-      tanggalLoa: new Date('2025-01-15'),
+      loaDate: new Date('2025-01-15'),
+      nim: '20251234567',
+      convertedAt: new Date('2025-02-01'),
     },
   ];
 
-  for (const student of students) {
-    const existing = await prisma.student.findUnique({
-      where: { noReg: student.noReg }
+  for (const applicant of applicants) {
+    const existing = await prisma.applicant.findUnique({
+      where: { registrationNumber: applicant.registrationNumber }
     });
 
     if (!existing) {
-      await prisma.student.create({ 
-        data: { id: uuidv4(), ...student } 
+      await prisma.applicant.create({ 
+        data: { id: uuidv4(), ...applicant } 
       });
-      console.log(`✅ Created student: ${student.namaLengkap}`);
+      console.log(`✅ Created applicant: ${applicant.fullName}`);
     } else {
-      console.log(`⏭️  Student ${student.namaLengkap} already exists, skipping...`);
+      console.log(`⏭️  Applicant ${applicant.fullName} already exists, skipping...`);
     }
   }
 
