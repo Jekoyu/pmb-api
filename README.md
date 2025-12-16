@@ -49,7 +49,7 @@ bun install
 
 ```bash
 # Generate Prisma Client
-bun run d
+bun run db:generate
 
 # Run migrations
 bun run db:migrate
@@ -366,10 +366,33 @@ DATABASE_URL="file:./pmb.db"
 bun run db:generate
 
 # Run migrations (production)
-bunx prisma migrate deploy
+bun run db:migrate:deploy
 
 # (Optional) Seed initial data
 bun run db:seed
+```
+
+### Render.com Deployment
+
+**Build Command:**
+
+```bash
+bun install && bun run db:generate && bun run db:migrate:deploy && bun run db:seed
+```
+
+**Start Command:**
+
+```bash
+bun run start
+```
+
+**Environment Variables (di Render Dashboard):**
+
+```
+PORT=3001
+NODE_ENV=production
+DB_PROVIDER=sqlite
+DATABASE_URL=file:./pmb.db
 ```
 
 #### 4. Running the Server

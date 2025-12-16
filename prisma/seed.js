@@ -6,22 +6,28 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('🌱 Starting database seed...');
 
-  // Create initial API Key
-  const apiKey = await prisma.apiKey.create({
-    data: {
-      id: uuidv4(),
-      name: 'Default Admin Key',
-      apiKey: `pmb_${uuidv4().replace(/-/g, '')}`,
-      isActive: true,
-    },
+  // Create initial API Key (upsert to avoid duplicates)
+  const existingApiKey = await prisma.apiKey.findFirst({
+    where: { name: 'Default Admin Key' }
   });
 
-  console.log('✅ Created API Key:', apiKey.apiKey);
+  if (!existingApiKey) {
+    const apiKey = await prisma.apiKey.create({
+      data: {
+        id: uuidv4(),
+        name: 'Default Admin Key',
+        apiKey: `pmb_${uuidv4().replace(/-/g, '')}`,
+        isActive: true,
+      },
+    });
+    console.log('✅ Created API Key:', apiKey.apiKey);
+  } else {
+    console.log('⏭️  API Key already exists, skipping...');
+  }
 
-  // Create sample students
+  // Create sample students (upsert to avoid duplicates)
   const students = [
     {
-      id: uuidv4(),
       noReg: 'REG-2025-001',
       namaLengkap: 'Ahmad Fauzi',
       jalur: 'Reguler',
@@ -51,7 +57,6 @@ async function main() {
       tanggalLoa: null,
     },
     {
-      id: uuidv4(),
       noReg: 'REG-2025-002',
       namaLengkap: 'Siti Rahma',
       jalur: 'Beasiswa',
@@ -83,35 +88,41 @@ async function main() {
   ];
 
   for (const student of students) {
-    await prisma.student.create({ data: student });
-    console.log(`✅ Created student: ${student.namaLengkap}`);
+    const existing = await prisma.student.findUnique({
+      where: { noReg: student.noReg }
+    });
+
+    if (!existing) {
+      await prisma.student.create({ 
+        data: { id: uuidv4(), ...student } 
+      });
+      console.log(`✅ Created student: ${student.namaLengkap}`);
+    } else {
+      console.log(`⏭️  Student ${student.namaLengkap} already exists, skipping...`);
+    }
   }
 
-  // Create sample study programs
+  // Create sample study programs (upsert to avoid duplicates)
   const studyPrograms = [
     {
-      id: uuidv4(),
       code: '51',
       name: 'Teknik Informatika',
       nimFormat: '{year}{code}{sequence}',
       isActive: true,
     },
     {
-      id: uuidv4(),
       code: '52',
       name: 'Sistem Informasi',
       nimFormat: '{year}{code}{sequence}',
       isActive: true,
     },
     {
-      id: uuidv4(),
       code: '53',
       name: 'Manajemen Informatika',
       nimFormat: '{year}{code}{sequence}',
       isActive: true,
     },
     {
-      id: uuidv4(),
       code: '54',
       name: 'Akuntansi',
       nimFormat: '{year}{code}{sequence}',
@@ -120,8 +131,18 @@ async function main() {
   ];
 
   for (const prodi of studyPrograms) {
-    await prisma.studyProgram.create({ data: prodi });
-    console.log(`✅ Created study program: ${prodi.name}`);
+    const existing = await prisma.studyProgram.findUnique({
+      where: { code: prodi.code }
+    });
+
+    if (!existing) {
+      await prisma.studyProgram.create({ 
+        data: { id: uuidv4(), ...prodi } 
+      });
+      console.log(`✅ Created study program: ${prodi.name}`);
+    } else {
+      console.log(`⏭️  Study program ${prodi.name} already exists, skipping...`);
+    }
   }
 
   console.log('🎉 Database seed completed!');
