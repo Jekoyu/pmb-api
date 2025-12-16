@@ -24,9 +24,9 @@ model ApiKey {
 }
 
 // =====================
-// Applicants Table
+// Students Table
 // =====================
-model Applicant {
+model Student {
   id                 String    @id @default(uuid())
   
   // Identitas utama
@@ -79,7 +79,7 @@ model Applicant {
   createdAt          DateTime  @default(now()) @map("created_at")
   updatedAt          DateTime  @updatedAt @map("updated_at")
 
-  @@map("applicants")
+  @@map("students")
 }
 
 // =====================

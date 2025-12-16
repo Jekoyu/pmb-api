@@ -25,8 +25,8 @@ async function main() {
     console.log('⏭️  API Key already exists, skipping...');
   }
 
-  // Create sample applicants (upsert to avoid duplicates)
-  const applicants = [
+  // Create sample students (upsert to avoid duplicates)
+  const students = [
     {
       registrationNumber: 'REG-2025-001',
       fullName: 'Ahmad Fauzi',
@@ -55,7 +55,7 @@ async function main() {
       agent: null,
       loaPublished: false,
       loaDate: null,
-      nim: null,
+      nim: '20251234566',
       convertedAt: null,
     },
     {
@@ -91,18 +91,18 @@ async function main() {
     },
   ];
 
-  for (const applicant of applicants) {
-    const existing = await prisma.applicant.findUnique({
-      where: { registrationNumber: applicant.registrationNumber }
+  for (const student of students) {
+    const existing = await prisma.student.findUnique({
+      where: { registrationNumber: student.registrationNumber }
     });
 
     if (!existing) {
-      await prisma.applicant.create({ 
-        data: { id: uuidv4(), ...applicant } 
+      await prisma.student.create({ 
+        data: { id: uuidv4(), ...student } 
       });
-      console.log(`✅ Created applicant: ${applicant.fullName}`);
+      console.log(`✅ Created student: ${student.fullName}`);
     } else {
-      console.log(`⏭️  Applicant ${applicant.fullName} already exists, skipping...`);
+      console.log(`⏭️  Student ${student.fullName} already exists, skipping...`);
     }
   }
 

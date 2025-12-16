@@ -23,13 +23,8 @@ class StudentService {
   }
 
   /**
-   * Get all students with pagination and search
+   * Get all students with optional filtering
    * @param {Object} options - Query options
-   * @param {number} options.page - Page number (default: 1)
-   * @param {number} options.limit - Items per page (default: 10)
-   * @param {string} options.search - Search term for nama_lengkap or no_reg
-   * @param {string} options.sortBy - Field to sort by (default: createdAt)
-   * @param {string} options.sortOrder - Sort order: asc or desc (default: desc)
    * @returns {Promise<Object>} Paginated student list
    */
   async findAll(options = {}) {
@@ -37,22 +32,45 @@ class StudentService {
       page = 1,
       limit = 10,
       search = '',
+      admissionPath,
+      majorChoice1,
+      loaPublished,
+      hasNim,
       sortBy = 'createdAt',
       sortOrder = 'desc',
     } = options;
 
     const skip = (page - 1) * limit;
 
-    // Build where clause for search
-    const where = search
-      ? {
-          OR: [
-            { namaLengkap: { contains: search } },
-            { noReg: { contains: search } },
-            { email: { contains: search } },
-          ],
-        }
-      : {};
+    // Build where clause
+    const where = {};
+
+    if (search) {
+      where.OR = [
+        { fullName: { contains: search, mode: 'insensitive' } },
+        { registrationNumber: { contains: search, mode: 'insensitive' } },
+        { email: { contains: search, mode: 'insensitive' } },
+        { nim: { contains: search, mode: 'insensitive' } },
+      ];
+    }
+
+    if (admissionPath) {
+      where.admissionPath = admissionPath;
+    }
+
+    if (majorChoice1) {
+      where.majorChoice1 = majorChoice1;
+    }
+
+    if (typeof loaPublished === 'boolean') {
+      where.loaPublished = loaPublished;
+    }
+
+    if (hasNim === true) {
+      where.nim = { not: null };
+    } else if (hasNim === false) {
+      where.nim = null;
+    }
 
     // Get total count
     const total = await prisma.student.count({ where });
@@ -93,12 +111,12 @@ class StudentService {
 
   /**
    * Get student by registration number
-   * @param {string} noReg - Registration number
+   * @param {string} registrationNumber - Registration number
    * @returns {Promise<Object|null>} Student record or null
    */
-  async findByNoReg(noReg) {
+  async findByRegistrationNumber(registrationNumber) {
     const student = await prisma.student.findUnique({
-      where: { noReg },
+      where: { registrationNumber },
     });
 
     return student;
@@ -120,7 +138,7 @@ class StudentService {
   }
 
   /**
-   * Delete a student
+   * Delete an student
    * @param {string} id - Student ID
    * @returns {Promise<Object>} Deleted student record
    */
@@ -133,31 +151,142 @@ class StudentService {
   }
 
   /**
-   * Check if student exists by ID
-   * @param {string} id - Student ID
+   * Check if registration number exists
+   * @param {string} registrationNumber - Registration number
+   * @param {string} excludeId - ID to exclude (for updates)
    * @returns {Promise<boolean>} True if exists
    */
-  async exists(id) {
-    const count = await prisma.student.count({
-      where: { id },
-    });
+  async registrationNumberExists(registrationNumber, excludeId = null) {
+    const where = excludeId
+      ? { registrationNumber, NOT: { id: excludeId } }
+      : { registrationNumber };
 
+    const count = await prisma.student.count({ where });
     return count > 0;
   }
 
   /**
-   * Check if registration number exists
-   * @param {string} noReg - Registration number
+   * Check if NIM exists
+   * @param {string} nim - NIM
    * @param {string} excludeId - ID to exclude (for updates)
    * @returns {Promise<boolean>} True if exists
    */
-  async noRegExists(noReg, excludeId = null) {
+  async nimExists(nim, excludeId = null) {
+    if (!nim) return false;
+    
     const where = excludeId
-      ? { noReg, NOT: { id: excludeId } }
-      : { noReg };
+      ? { nim, NOT: { id: excludeId } }
+      : { nim };
 
     const count = await prisma.student.count({ where });
     return count > 0;
+  }
+
+  /**
+   * Convert student to student (assign NIM)
+   * @param {string} id - Student ID
+   * @param {string} nim - NIM to assign
+   * @returns {Promise<Object>} Updated student record
+   */
+  async convertToStudent(id, nim) {
+    const student = await prisma.student.update({
+      where: { id },
+      data: {
+        nim,
+        convertedAt: new Date(),
+      },
+    });
+
+    return student;
+  }
+
+  /**
+   * Publish LOA for an student
+   * @param {string} id - Student ID
+   * @returns {Promise<Object>} Updated student record
+   */
+  async publishLoa(id) {
+    const student = await prisma.student.update({
+      where: { id },
+      data: {
+        loaPublished: true,
+        loaDate: new Date(),
+      },
+    });
+
+    return student;
+  }
+
+  /**
+   * Bulk create students (for sync from external API)
+   * @param {Array} students - Array of students
+   * @returns {Promise<Object>} Result summary
+   */
+  async syncFromExternal(students) {
+    let created = 0;
+    let updated = 0;
+    let errors = [];
+
+    for (const student of students) {
+      try {
+        // Map snake_case to camelCase if needed
+        const data = {
+          registrationNumber: student.registrationNumber || student.registration_number,
+          fullName: student.fullName || student.full_name,
+          admissionPath: student.admissionPath || student.admission_path,
+          majorChoice1: student.majorChoice1 || student.major_choice_1,
+          email: student.email,
+          phone: student.phone,
+          graduationYear: student.graduationYear || student.graduation_year,
+          gender: student.gender,
+          schoolOrigin: student.schoolOrigin || student.school_origin,
+          schoolMajor: student.schoolMajor || student.school_major,
+          ranking: student.ranking,
+          parentName: student.parentName || student.parent_name,
+          parentPhone: student.parentPhone || student.parent_phone,
+          religion: student.religion,
+          colorBlind: student.colorBlind || student.color_blind || false,
+          province: student.province,
+          city: student.city,
+          village: student.village,
+          district: student.district,
+          postalCode: student.postalCode || student.postal_code,
+          homeAddress: student.homeAddress || student.home_address,
+          majorChoice2: student.majorChoice2 || student.major_choice_2,
+          majorChoice3: student.majorChoice3 || student.major_choice_3,
+          majorChoice4: student.majorChoice4 || student.major_choice_4,
+          agent: student.agent,
+          loaPublished: student.loaPublished || student.loa_published || false,
+          loaDate: student.loaDate || student.loa_date,
+          nim: student.nim,
+          convertedAt: student.convertedAt || student.converted_at,
+        };
+
+        const existing = await prisma.student.findUnique({
+          where: { registrationNumber: data.registrationNumber }
+        });
+
+        if (existing) {
+          await prisma.student.update({
+            where: { registrationNumber: data.registrationNumber },
+            data,
+          });
+          updated++;
+        } else {
+          await prisma.student.create({
+            data: { id: uuidv4(), ...data },
+          });
+          created++;
+        }
+      } catch (error) {
+        errors.push({ 
+          registrationNumber: student.registrationNumber || student.registration_number, 
+          error: error.message 
+        });
+      }
+    }
+
+    return { created, updated, errors };
   }
 }
 
