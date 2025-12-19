@@ -31,7 +31,7 @@ async function main() {
       registrationNumber: 'REG-2025-001',
       fullName: 'Ahmad Fauzi',
       admissionPath: 'Reguler',
-      majorChoice1: 'Teknik Informatika',
+      majorChoice1: 'Informatika',
       email: 'ahmad.fauzi@example.com',
       phone: '081234567890',
       graduationYear: 2025,
@@ -137,13 +137,22 @@ async function main() {
     },
     {
       idProdi: '13',
-      namaProdi: 'Teknik Informatika',
+      namaProdi: 'Informatika',
       idJenjang: '5',
       namaJenjang: 'S1',
       idFakultas: '2',
       namaFakultas: 'Fakultas Teknik dan Informatika',
       isActive: true,
     },
+    {
+      idProdi: '14',
+      namaProdi: 'Sains Data',
+      idJenjang: '5',
+      namaJenjang: 'S1',
+      idFakultas: '2',
+      namaFakultas: 'Fakultas Teknik dan Informatika',
+      isActive: true,
+    }
   ];
 
   for (const prodi of studyPrograms) {
